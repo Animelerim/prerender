@@ -4,3 +4,4 @@ node_modules/
 .elasticbeanstalk/
 .idea/
 ecosystem.json
+start.sh
