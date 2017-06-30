@@ -21,7 +21,9 @@
     "sinon": "^1.17.5"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha",
+    "pm2": "pm2 start -n prerender server.js",
+    "pm2-eco": "pm2 start ecosystem.json"
   },
   "bin": {
     "prerender": "server.js"
