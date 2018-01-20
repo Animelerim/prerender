@@ -1,20 +1,23 @@
 #!/usr/bin/env node
-var prerender = require('./lib');
+const Path = require('path');
+const AllConfig = require('../configuration')
+const Prerender = require('./lib');
+const Config = AllConfig[Path.basename(__dirname)]
 
-var server = prerender({
-    workers: process.env.PRERENDER_NUM_WORKERS,
-    iterations: process.env.PRERENDER_NUM_ITERATIONS
-});
+if (Config.env) {
+  Object.keys(Config.env).forEach(function (key) {
+    if (Config.env[key]) {
+      Object.defineProperty(process.env, key, { value: Config.env[key] });
+    }
+  })
+}
 
+const PrerenderServer = Prerender(Config.main)
 
-server.use(prerender.sendPrerenderHeader());
-// server.use(prerender.basicAuth());
-server.use(prerender.whitelist());
-// server.use(prerender.blacklist());
-server.use(prerender.logger());
-server.use(prerender.removeScriptTags());
-server.use(prerender.httpHeaders());
-// server.use(prerender.inMemoryHtmlCache());
-server.use(prerender.s3HtmlCache());
+if (Config.plugins && Config.plugins.length > 0) {
+  Config.plugins.forEach(function (name) {
+    PrerenderServer.use(Prerender[name]())
+  })
+}
 
-server.start();
+PrerenderServer.start();
